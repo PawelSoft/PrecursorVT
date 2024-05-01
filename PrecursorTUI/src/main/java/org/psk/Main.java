@@ -53,9 +53,9 @@ public class Main {
 
             // Create window to hold the panel
             window.setComponent(panel.withBorder(Borders.singleLine()));
-
+            NumberSystemConverterWindow numberSystemConverterWindow = new NumberSystemConverterWindow();
             // Create gui and start gui
-            gui.addWindowAndWait(window);
+            gui.addWindowAndWait(numberSystemConverterWindow);
         } catch (IOException e) {
             e.printStackTrace();
         }
