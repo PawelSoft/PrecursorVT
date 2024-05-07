@@ -45,8 +45,7 @@ public class TodoTable<V> extends Table<V> {
         } else {
             return super.handleKeyStroke(keyStroke);
         }
-
-        this.invalidate();
+        
         return Result.HANDLED;
     }
 }
