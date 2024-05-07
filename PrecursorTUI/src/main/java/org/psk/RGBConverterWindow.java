@@ -16,7 +16,8 @@ public class RGBConverterWindow extends BasicWindow {
     private ProgressBar greenProgressBar;
     private ProgressBar blueProgressBar;
     private final Label resultLabel = new Label("Wynik: #------");
-
+    private MultiWindowTextGUI gui;
+    private  MainWindow mainwindow ;
     private final Runnable onInputAction = () -> {
         int red = 0;
         int green = 0;
@@ -57,9 +58,10 @@ public class RGBConverterWindow extends BasicWindow {
         }
     };
 
-    public RGBConverterWindow() {
+    public RGBConverterWindow(MultiWindowTextGUI gui, MainWindow mainwindow) {
         super("RGB Converter");
-
+        this.gui = gui;
+        this.mainwindow = mainwindow;
         initWindow();
     }
 
@@ -106,6 +108,15 @@ public class RGBConverterWindow extends BasicWindow {
 
         panel.addComponent(new EmptySpace());
         panel.addComponent(resultLabel);
+        panel.addComponent(new EmptySpace());
+        Button buttonmainwindow = new Button("Wyjdz do menu", new Runnable() {
+            @Override
+            public void run() {
+                gui.removeWindow(RGBConverterWindow.this);
+                gui.addWindowAndWait(mainwindow);
+            }
+        });
+        panel.addComponent(buttonmainwindow);
         setComponent(panel);
     }
 

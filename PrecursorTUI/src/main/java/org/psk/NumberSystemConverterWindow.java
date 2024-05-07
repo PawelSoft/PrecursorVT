@@ -15,10 +15,12 @@ public class NumberSystemConverterWindow extends BasicWindow {
     private final Label hexLabelRes = new Label("---");
     private final Label decimalLabelRes = new Label("---");
     private final Label labelInfo = new Label("");
-
-    public NumberSystemConverterWindow() {
+    private MultiWindowTextGUI gui;
+    private  MainWindow mainwindow ;
+    public NumberSystemConverterWindow(MultiWindowTextGUI gui, MainWindow mainwindow) {
         super("Konwerter systemów liczbowych");
-
+        this.gui = gui;
+        this.mainwindow = mainwindow;
         initWindow();
     }
 
@@ -61,7 +63,15 @@ public class NumberSystemConverterWindow extends BasicWindow {
         panel.addComponent(new Separator(Direction.HORIZONTAL));
         panel.addComponent(resultPanel);
         panel.addComponent(labelInfo);
-
+        panel.addComponent(new EmptySpace());
+        Button buttonmainwindow = new Button("Wyjdz do menu", new Runnable() {
+            @Override
+            public void run() {
+                gui.removeWindow(NumberSystemConverterWindow.this);
+                gui.addWindowAndWait(mainwindow);
+            }
+        });
+        panel.addComponent(buttonmainwindow);
         setComponent(panel);
     }
 
