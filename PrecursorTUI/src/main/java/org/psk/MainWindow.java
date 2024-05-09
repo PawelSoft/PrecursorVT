@@ -10,12 +10,14 @@ import java.util.HashSet;
 public class MainWindow extends BasicWindow {
     private RGBConverterWindow rgbconverterwindow;
     private NumberSystemConverterWindow numbersystemconverterwindow;
+    private  TodoListWindow todolistwindow;
     private MultiWindowTextGUI gui;
     public MainWindow(MultiWindowTextGUI gui) {
         super("PrecursorVT");
         this.gui = gui;
         rgbconverterwindow = new RGBConverterWindow(gui,this);
         numbersystemconverterwindow = new NumberSystemConverterWindow(gui,this);
+        todolistwindow = new TodoListWindow(gui, gui.getScreen(),this);
         initWindow();
 
     }
@@ -45,13 +47,19 @@ public class MainWindow extends BasicWindow {
             }
         });
         buttonnumbersystemconverterwindow.setPreferredSize(new TerminalSize(40, 2));
+        Button buttontodolistwindow= new Button("TodoList", new Runnable() {
+            @Override
+            public void run() {
+                gui.removeWindow(MainWindow.this);
+                gui.addWindowAndWait(todolistwindow);
+            }
+        });
 
 
-
-
+        buttontodolistwindow.setPreferredSize(new TerminalSize(40, 2));
         panel.addComponent(buttonrgbconverterwindow);
         panel.addComponent(buttonnumbersystemconverterwindow);
-
+        panel.addComponent(buttontodolistwindow);
 
         panel.addComponent(new EmptySpace());
         Button buttonclosed= new Button("Wyjdz z programu", new Runnable() {
