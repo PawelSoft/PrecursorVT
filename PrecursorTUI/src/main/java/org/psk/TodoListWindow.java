@@ -3,6 +3,7 @@ package org.psk;
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.dialogs.MessageDialog;
+import com.googlecode.lanterna.gui2.dialogs.MessageDialogButton;
 import com.googlecode.lanterna.gui2.menu.Menu;
 import com.googlecode.lanterna.gui2.menu.MenuBar;
 import com.googlecode.lanterna.gui2.menu.MenuItem;
@@ -10,13 +11,17 @@ import com.googlecode.lanterna.screen.Screen;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TodoListWindow extends BasicWindow  {
 
+    public final static String dateRegex
+            = "^(0[1-9]|[1-2][0-9]|3[0-1])\\.(0[1-9]|1[0-2])\\.\\d{4} (0[0-9]|1[0-9]|2[0-3])\\.(0[0-9]|[1-5][0-9])$";
 
     private final List<TodoListRecord> todoDataItems = new ArrayList<>();
 
@@ -38,7 +43,7 @@ public class TodoListWindow extends BasicWindow  {
     private TextBox dateTextBox;
 
     private final Label statusLabel = new Label("");
-    private  MainWindow mainwindow;
+    private  MainWindow mainwindow ;
     public TodoListWindow(MultiWindowTextGUI gui, Screen screen,MainWindow mainwindow) {
         super("Todo List");
         this.gui = gui;
@@ -50,6 +55,17 @@ public class TodoListWindow extends BasicWindow  {
     public static String formatLocalDateTime(LocalDateTime dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
 
+        return dateTime.format(formatter);
+    }
+
+    // dla kogoś
+    public static LocalDateTime convertToDate(String dateStr, String format) throws DateTimeParseException {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
+        return LocalDateTime.parse(dateStr, formatter);
+    }
+
+    public static String convertToString(LocalDateTime dateTime, String format) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return dateTime.format(formatter);
     }
 
@@ -67,6 +83,22 @@ public class TodoListWindow extends BasicWindow  {
 
         dateTextBox = new TextBox(new TerminalSize(20, 1));
         dateTextBox.setValidationPattern(Pattern.compile("^[0-9 .]+$"));
+        dateTextBox.setTextChangeListener((s, b) -> {
+            Pattern pattern = Pattern.compile(dateRegex);
+            Matcher matcher = pattern.matcher(s);
+
+            if (s.isEmpty()) {
+                statusLabel.setText("");
+                return;
+            }
+
+            if (!matcher.matches()) {
+                statusLabel.setText("Podaj poprawną datę i czas.");
+            }
+            else {
+                statusLabel.setText("");
+            }
+        });
 
         MenuBar menubar = new MenuBar();
 
@@ -98,9 +130,43 @@ public class TodoListWindow extends BasicWindow  {
 
         setMenuBar(menubar);
 
-        addButton = new Button("Dodaj");
+        addButton = new Button("Dodaj", () -> {
+            String format = "dd.MM.yyyy HH.mm";
+            String task = taskTextBox.getText();
+            LocalDateTime dateTime;
+            if (task.isEmpty())
+                return;
 
-        cancelEditButton = new Button("Anuluj edycję");
+            updateSize();
+
+            try {
+                dateTime = convertToDate(dateTextBox.getText(), format);
+            } catch (DateTimeParseException e) {
+                statusLabel.setText("Podano niepoprawną datę i czas.");
+                return;
+            }
+
+            if (!isEditMode) {
+                Integer rowNum = todoTable.getTableModel().getRowCount()+1;
+
+                TodoListRecord newTask = new TodoListRecord(rowNum, task, LocalDateTime.now(), dateTime, false);
+                todoDataItems.add(newTask);
+                updateList();
+            }
+            else {
+                TodoListRecord record = todoDataItems.get(editRowId);
+                record.setTask(task);
+                record.setExpiredDate(dateTime);
+                updateList();
+            }
+            setEditMode(false);
+        });
+
+        cancelEditButton = new Button("Anuluj edycję", () -> {
+            if (isEditMode) {
+                setEditMode(false);
+            }
+        });
         cancelEditButton.setVisible(false);
 
         panel.addComponent(todoTable);
@@ -130,6 +196,98 @@ public class TodoListWindow extends BasicWindow  {
         });
         panel.addComponent(buttonmainwindow);
         setComponent(panel);
+
+        todoTable.setSelectAction(new Runnable() {
+            @Override
+            public void run() {
+                int rowId = todoTable.getSelectedRow();
+                TodoListRecord record = todoDataItems.get(rowId);
+
+                record.setDone(!record.isDone());
+                updateDoneState(rowId, record.isDone());
+            }
+        });
+
+        todoTable.setDeleteAction(new Runnable() {
+            @Override
+            public void run() {
+                if (todoDataItems.isEmpty())
+                    return;
+
+                MessageDialogButton selectedBtn =  MessageDialog.showMessageDialog(gui,
+                        "Usuwanie", "Czy na pewno chcesz usunąć wpis?",
+                        MessageDialogButton.Yes, MessageDialogButton.No);
+
+                if (selectedBtn == MessageDialogButton.No) {
+                    return;
+                }
+
+                int rowId = todoTable.getSelectedRow();
+                TodoListRecord record = todoDataItems.get(rowId);
+                todoTable.getTableModel().removeRow(rowId);
+                todoDataItems.remove(record);
+                setEditMode(false);
+            }
+        });
+
+        todoTable.setEditAction(new Runnable() {
+            @Override
+            public void run() {
+                if (todoDataItems.isEmpty())
+                    return;
+
+                int rowId = todoTable.getSelectedRow();
+                TodoListRecord record = todoDataItems.get(rowId);
+                isEditMode = !isEditMode;
+
+                if (isEditMode) {
+                    String date = convertToString(record.getExpiredDate(), "dd.MM.yyyy HH.mm");
+
+                    addButton.setLabel("Edytuj");
+                    taskTextBox.setText(record.getTask());
+                    dateTextBox.setText(date);
+                    editRowId = rowId;
+                    setEditMode(true);
+                }
+                else {
+                    setEditMode(false);
+                }
+            }
+        });
+
+        todoTable.setPreferredSize(new TerminalSize(80, 10));
+    }
+
+    public void updateSize() {
+        int rows = panel.getSize().getRows()-9;
+        if (rows < 2) {
+            return;
+        }
+
+        todoTable.setPreferredSize(new TerminalSize(panel.getSize().getColumns(), panel.getSize().getRows()-9));
+    }
+
+    private void setEditMode(boolean isEditMode) {
+        this.isEditMode = isEditMode;
+        if (isEditMode) {
+            addButton.setLabel("Edytuj");
+            cancelEditButton.setVisible(true);
+        }
+        else {
+            addButton.setLabel("Dodaj");
+            taskTextBox.setText("");
+            dateTextBox.setText("");
+            editRowId = -1;
+            cancelEditButton.setVisible(false);
+        }
+    }
+
+    private void updateDoneState(int rowId, boolean isDone) {
+        if (rowId > -1) {
+            String isDoneStr = (isDone) ? "[ + ]" : "[ - ]";
+
+            todoTable.getTableModel().setCell(1, rowId, isDoneStr);
+        }
     }
 
     public void updateList() {
