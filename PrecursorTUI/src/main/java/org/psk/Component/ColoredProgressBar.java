@@ -1,4 +1,4 @@
-package org.psk.uicomponent;
+package org.psk.Component;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TerminalTextUtils;

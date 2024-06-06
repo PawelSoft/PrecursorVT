@@ -8,8 +8,8 @@ import com.googlecode.lanterna.gui2.menu.Menu;
 import com.googlecode.lanterna.gui2.menu.MenuBar;
 import com.googlecode.lanterna.gui2.menu.MenuItem;
 import com.googlecode.lanterna.screen.Screen;
-import org.psk.uicomponent.TodoListRecord;
-import org.psk.uicomponent.TodoTable;
+import org.psk.Component.TodoListRecord;
+import org.psk.Component.TodoTable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;

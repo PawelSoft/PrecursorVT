@@ -1,4 +1,4 @@
-package org.psk.uicomponent;
+package org.psk.Component;
 
 import com.googlecode.lanterna.gui2.Interactable;
 import com.googlecode.lanterna.gui2.table.Table;

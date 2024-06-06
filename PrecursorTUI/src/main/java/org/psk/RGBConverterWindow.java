@@ -4,7 +4,7 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
-import org.psk.uicomponent.ColoredProgressBar;
+import org.psk.Component.ColoredProgressBar;
 
 import java.util.HashSet;
 

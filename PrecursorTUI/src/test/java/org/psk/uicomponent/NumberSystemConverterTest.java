@@ -1,6 +1,8 @@
 package org.psk.uicomponent;
 
 import org.junit.jupiter.api.Test;
+import org.psk.Component.NumberSystemConverter;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class NumberSystemConverterTest {

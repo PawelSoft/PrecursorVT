@@ -6,7 +6,7 @@ import com.googlecode.lanterna.gui2.*;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
-import static org.psk.uicomponent.NumberSystemConverter.*;
+import static org.psk.Component.NumberSystemConverter.*;
 
 public class NumberSystemConverterWindow extends BasicWindow {
 
