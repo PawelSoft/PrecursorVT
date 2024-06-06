@@ -4,11 +4,13 @@ import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
 import com.googlecode.lanterna.gui2.Label;
 import com.googlecode.lanterna.gui2.Panel;
+import org.psk.uicomponent.ColoredProgressBar;
 
 import java.util.HashSet;
 
 public class RGBConverterWindow extends BasicWindow {
 
+    // Pola okna konwertera RGB
     private final TextBox redInput = new TextBox();
     private final TextBox greenInput = new TextBox();
     private final TextBox blueInput = new TextBox();
@@ -16,14 +18,15 @@ public class RGBConverterWindow extends BasicWindow {
     private ProgressBar greenProgressBar;
     private ProgressBar blueProgressBar;
     private final Label resultLabel = new Label("Wynik: #------");
-    private MultiWindowTextGUI gui;
-    private  MainWindow mainwindow ;
+    private final MultiWindowTextGUI gui;
+    private final MainWindow mainwindow;
     private final Runnable onInputAction = () -> {
         int red = 0;
         int green = 0;
         int blue = 0;
 
         try {
+            // Pobranie wartości wejściowych
             if (!redInput.getText().isEmpty()) {
                 red = Integer.parseInt(redInput.getText());
             }
@@ -34,6 +37,7 @@ public class RGBConverterWindow extends BasicWindow {
                 blue = Integer.parseInt(blueInput.getText());
             }
 
+            // Walidacja wartości
             if (red < 0 || red > 255) {
                 redInput.setText("0");
                 return;
@@ -47,6 +51,7 @@ public class RGBConverterWindow extends BasicWindow {
                 return;
             }
 
+            // Aktualizacja pasków postępu i wyniku
             redProgressBar.setValue(red);
             greenProgressBar.setValue(green);
             blueProgressBar.setValue(blue);
@@ -58,6 +63,7 @@ public class RGBConverterWindow extends BasicWindow {
         }
     };
 
+    // Konstruktor klasy RGBConverterWindow
     public RGBConverterWindow(MultiWindowTextGUI gui, MainWindow mainwindow) {
         super("RGB Converter");
         this.gui = gui;
@@ -65,6 +71,7 @@ public class RGBConverterWindow extends BasicWindow {
         initWindow();
     }
 
+    // Metoda inicjalizująca okno konwertera RGB
     private void initWindow() {
         HashSet<Hint> newHints = new HashSet<>(getHints());
         newHints.add(Window.Hint.NO_POST_RENDERING);
@@ -74,16 +81,18 @@ public class RGBConverterWindow extends BasicWindow {
 
         Panel panel = new Panel(new LinearLayout(Direction.VERTICAL));
 
+        // Panel wejściowy dla wartości kolorów RGB
         Panel redInputPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Panel greenInputPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
         Panel blueInputPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
 
+        // Dodanie etykiet i pól tekstowych do paneli wejściowych
         redInputPanel.addComponent(new Label("Czerwony - Red   (0-255):"));
         redInput.setTextChangeListener((s, b) -> onInputAction.run());
-
         redInputPanel.addComponent(redInput);
         panel.addComponent(redInputPanel);
 
+        // Utworzenie i dodanie pasków postępu
         redProgressBar = new ColoredProgressBar(0, 255, 34, TextColor.ANSI.RED);
         panel.addComponent(redProgressBar.withBorder(Borders.singleLine()));
         panel.addComponent(new EmptySpace());
@@ -106,22 +115,22 @@ public class RGBConverterWindow extends BasicWindow {
         panel.addComponent(blueProgressBar.withBorder(Borders.singleLine()));
         panel.addComponent(new EmptySpace());
 
+        // Dodanie etykiety wyniku
         panel.addComponent(new EmptySpace());
         panel.addComponent(resultLabel);
         panel.addComponent(new EmptySpace());
-        Button buttonmainwindow = new Button("Wyjdz do menu", new Runnable() {
-            @Override
-            public void run() {
-                gui.removeWindow(RGBConverterWindow.this);
-                gui.addWindowAndWait(mainwindow);
-            }
+
+        // Dodanie przycisku do powrotu do menu głównego
+        Button buttonMainWindow = new Button("Wyjdź do menu", () -> {
+            gui.removeWindow(RGBConverterWindow.this);
+            gui.addWindowAndWait(mainwindow);
         });
-        panel.addComponent(buttonmainwindow);
+        panel.addComponent(buttonMainWindow);
         setComponent(panel);
     }
 
+    // Metoda konwertująca wartości RGB na kolor w formacie heksadecymalnym
     public String convertRGBtoHex(int r, int g, int b) {
         return String.format("#%02X%02X%02X", r, g, b);
     }
-
 }

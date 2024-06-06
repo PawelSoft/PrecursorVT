@@ -1,4 +1,4 @@
-package org.psk;
+package org.psk.uicomponent;
 
 public class NumberSystemConverter {
 
