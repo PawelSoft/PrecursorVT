@@ -7,55 +7,73 @@ import com.googlecode.lanterna.input.KeyType;
 
 import java.util.Objects;
 
+/**
+ * Rozszerzenie klasy Table z biblioteki Lanterna, reprezentujące tabelę zadań do zarządzania zadaniami.
+ *
+ * @param <V> Typ danych przechowywanych w tabeli.
+ */
 public class TodoTable<V> extends Table<V> {
 
-    // Działania wywoływane podczas usuwania lub edytowania
     private Runnable deleteAction;
     private Runnable editAction;
 
-    // Konstruktor przyjmujący etykiety kolumn
+    /**
+     * Konstruktor tworzący tabelę z podanymi etykietami kolumn.
+     *
+     * @param columnLabels Etykiety kolumn tabeli.
+     */
     public TodoTable(String... columnLabels) {
         super(columnLabels);
     }
 
-    // Setter dla akcji usuwania
+    /**
+     * Ustawia akcję usuwania, która ma być wykonana po naciśnięciu klawisza Delete.
+     *
+     * @param deleteAction Akcja usuwania do ustawienia.
+     */
     public void setDeleteAction(Runnable deleteAction) {
         this.deleteAction = deleteAction;
     }
 
-    // Setter dla akcji edytowania
+    /**
+     * Ustawia akcję edytowania, która ma być wykonana po naciśnięciu klawisza F2.
+     *
+     * @param editAction Akcja edytowania do ustawienia.
+     */
     public void setEditAction(Runnable editAction) {
         this.editAction = editAction;
     }
 
-    // Przechwytuje i obsługuje naciśnięcia klawiszy
+    /**
+     * Przechwytuje i obsługuje naciśnięcia klawiszy, specyficzne dla tabeli zadań.
+     *
+     * @param keyStroke Naciśnięcie klawisza do obsłużenia.
+     * @return Wynik operacji obsługi zdarzenia klawiatury.
+     */
     @Override
     public Interactable.Result handleKeyStroke(KeyStroke keyStroke) {
-        // Sprawdza, czy naciśnięty klawisz to Delete
+
         if (Objects.requireNonNull(keyStroke.getKeyType()) == KeyType.Delete) {
-            // Uruchamia akcję usuwania, jeśli jest zdefiniowana
+
             Runnable runnable = this.deleteAction;
             if (runnable == null) {
-                return Result.HANDLED;  // Klawisz obsłużony, ale brak zdefiniowanej akcji
+                return Result.HANDLED;
             }
 
             runnable.run();
-        }
-        // Sprawdza, czy naciśnięty klawisz to F2
-        else if (Objects.requireNonNull(keyStroke.getKeyType()) == KeyType.F2) {
-            // Uruchamia akcję edytowania, jeśli jest zdefiniowana
+        } else if (Objects.requireNonNull(keyStroke.getKeyType()) == KeyType.F2) {
+
             Runnable runnable = this.editAction;
             if (runnable == null) {
-                return Result.HANDLED;  // Klawisz obsłużony, ale brak zdefiniowanej akcji
+                return Result.HANDLED;
             }
 
             runnable.run();
-            return Result.MOVE_FOCUS_DOWN;  // Przenosi fokus na następny element po edytowaniu
+            return Result.MOVE_FOCUS_DOWN;
         } else {
-            // Jeśli klawisz nie jest Delete ani F2, przekazuje obsługę do nadrzędnej metody
             return super.handleKeyStroke(keyStroke);
         }
 
-        return Result.HANDLED;  // Klawisz został obsłużony
+        return Result.HANDLED;
     }
 }

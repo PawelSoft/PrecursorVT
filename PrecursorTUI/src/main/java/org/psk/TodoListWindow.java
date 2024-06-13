@@ -20,45 +20,52 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TodoListWindow extends BasicWindow  {
+/**
+ * Okno aplikacji listy zadań (TODO list).
+ */
+public class TodoListWindow extends BasicWindow {
 
-    // Regex do walidacji daty i czasu
     public final static String dateRegex
             = "^(0[1-9]|[1-2][0-9]|3[0-1])\\.(0[1-9]|1[0-2])\\.\\d{4} (0[0-9]|1[0-9]|2[0-3])\\.(0[0-9]|[1-5][0-9])$";
 
-    // Lista zadań
     private final List<TodoListRecord> todoDataItems = new ArrayList<>();
 
-    // Tabela zadań
+
     private final TodoTable<String> todoTable = new TodoTable<>(
             "Id", "Wykonane", "Zadanie",
             "Data wygaśnięcia", "Data utworzenia");
 
-    // Interfejs użytkownika i ekran
+
     private final MultiWindowTextGUI gui;
     private final Screen screen;
 
-    // Okno główne
+
     private final MainWindow mainwindow;
 
-    // Tryb edycji
+
     private boolean isEditMode = false;
     private int editRowId = -1;
 
-    // Panel i przyciski
+
     private Panel panel;
     private Button addButton;
     private Button cancelEditButton;
 
-    // Pola tekstowe
+
     private TextBox taskTextBox;
     private TextBox dateTextBox;
 
-    // Etykieta statusu
+
     private final Label statusLabel = new Label("");
 
-    // Konstruktor
-    public TodoListWindow(MultiWindowTextGUI gui, Screen screen,MainWindow mainwindow) {
+    /**
+     * Konstruktor klasy TodoListWindow.
+     *
+     * @param gui       Interfejs GUI, na którym będzie wyświetlane okno.
+     * @param screen    Obiekt ekranu Lanterna, na którym renderowane jest okno.
+     * @param mainwindow Referencja do głównego okna aplikacji.
+     */
+    public TodoListWindow(MultiWindowTextGUI gui, Screen screen, MainWindow mainwindow) {
         super("Todo List");
         this.gui = gui;
         this.screen = screen;
@@ -66,40 +73,59 @@ public class TodoListWindow extends BasicWindow  {
         initWindow();
     }
 
-    // Formatowanie daty i czasu
+    /**
+     * Metoda formatująca obiekt LocalDateTime do postaci tekstowej.
+     *
+     * @param dateTime Obiekt LocalDateTime do sformatowania.
+     * @return Sformatowana data i czas w formacie "dd.MM.yyyy HH:mm".
+     */
     public static String formatLocalDateTime(LocalDateTime dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
         return dateTime.format(formatter);
     }
 
-    // Konwersja tekstu na datę i czas
+    /**
+     * Metoda konwertująca tekstową reprezentację daty i czasu na obiekt LocalDateTime.
+     *
+     * @param dateStr Tekstowa reprezentacja daty i czasu.
+     * @param format  Format daty i czasu (np. "dd.MM.yyyy HH.mm").
+     * @return Obiekt LocalDateTime.
+     * @throws DateTimeParseException Wyjątek rzucany w przypadku niepoprawnego formatu daty i czasu.
+     */
     public static LocalDateTime convertToDate(String dateStr, String format) throws DateTimeParseException {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return LocalDateTime.parse(dateStr, formatter);
     }
 
-    // Konwersja daty i czasu na tekst
+    /**
+     * Metoda konwertująca obiekt LocalDateTime na tekstową reprezentację daty i czasu.
+     *
+     * @param dateTime Obiekt LocalDateTime do konwersji.
+     * @param format   Format daty i czasu (np. "dd.MM.yyyy HH.mm").
+     * @return Tekstowa reprezentacja daty i czasu.
+     */
     public static String convertToString(LocalDateTime dateTime, String format) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern(format);
         return dateTime.format(formatter);
     }
 
-    // Inicjalizacja okna
+    /**
+     * Metoda inicjalizująca okno aplikacji listy zadań.
+     */
     private void initWindow() {
-        // Etykiety i pola tekstowe
+
         Label taskLabel = new Label("Zadanie:");
         Label taskExpireLabel = new Label("Termin: ");
         Panel inputPanel = new Panel(new GridLayout(2));
 
-        // Panel główny
         panel = new Panel();
         panel.setLayoutManager(new GridLayout(1));
 
-        // Tabela zadań
+
         panel.addComponent(new Label("Zadania:"));
         taskTextBox = new TextBox(new TerminalSize(20, 1));
 
-        // Pole tekstowe do wprowadzania daty wygaśnięcia
+
         dateTextBox = new TextBox(new TerminalSize(20, 1));
         dateTextBox.setValidationPattern(Pattern.compile("^[0-9.]+$"));
         dateTextBox.setTextChangeListener((s, b) -> {
@@ -113,36 +139,36 @@ public class TodoListWindow extends BasicWindow  {
 
             if (!matcher.matches()) {
                 statusLabel.setText("Podaj poprawną datę i czas.");
-            }
-            else {
+            } else {
                 statusLabel.setText("");
             }
         });
 
-        // Menu
+
         MenuBar menubar = new MenuBar();
 
-        // "File" menu
+
         Menu menuFile = new Menu("Plik");
         menuFile.add(new MenuItem("Wyjdź", () -> System.exit(0)));
-        Menu menuHelp = new Menu("Pomoc");
 
-        menuHelp.add(new MenuItem( "Instrukcja obsłuż", () -> MessageDialog.showMessageDialog(gui,
-                "instrukcja obsługi",
-                """
-                        Opis przycisków:
-                        F2 - edycja wpisu
-                        Del - usuwanie wpisu
-                        Enter - oznaczenie wykonania zadania""")));
-        menuHelp.add(new MenuItem( "O programie",
-                () -> MessageDialog.showMessageDialog(gui, "Informacja", "Lista zadań v. 1.0.")));
+
+        Menu menuHelp = new Menu("Pomoc");
+        menuHelp.add(new MenuItem("Instrukcja obsługi", () -> MessageDialog.showMessageDialog(gui,
+                "Instrukcja obsługi",
+                "Opis przycisków:\n" +
+                        "F2 - edycja wpisu\n" +
+                        "Del - usuwanie wpisu\n" +
+                        "Enter - oznaczenie wykonania zadania")));
+        menuHelp.add(new MenuItem("O programie", () -> MessageDialog.showMessageDialog(gui,
+                "Informacja",
+                "Lista zadań v. 1.0.")));
 
         menubar.add(menuFile);
         menubar.add(menuHelp);
 
         setMenuBar(menubar);
 
-        // Przyciski
+
         addButton = new Button("Dodaj", () -> {
             String format = "dd.MM.yyyy HH.mm";
             String task = taskTextBox.getText();
@@ -160,13 +186,12 @@ public class TodoListWindow extends BasicWindow  {
             }
 
             if (!isEditMode) {
-                Integer rowNum = todoTable.getTableModel().getRowCount()+1;
+                Integer rowNum = todoTable.getTableModel().getRowCount() + 1;
 
                 TodoListRecord newTask = new TodoListRecord(rowNum, task, LocalDateTime.now(), dateTime, false);
                 todoDataItems.add(newTask);
                 updateList();
-            }
-            else {
+            } else {
                 TodoListRecord record = todoDataItems.get(editRowId);
                 record.setTask(task);
                 record.setExpiredDate(dateTime);
@@ -182,7 +207,7 @@ public class TodoListWindow extends BasicWindow  {
         });
         cancelEditButton.setVisible(false);
 
-        // Dodanie komponentów do panelu
+
         panel.addComponent(todoTable);
 
         inputPanel.addComponent(taskLabel);
@@ -208,7 +233,7 @@ public class TodoListWindow extends BasicWindow  {
         panel.addComponent(buttonMainWindow);
         setComponent(panel);
 
-        // Akcje tabeli
+
         todoTable.setSelectAction(() -> {
             int rowId = todoTable.getSelectedRow();
             TodoListRecord record = todoDataItems.get(rowId);
@@ -221,7 +246,7 @@ public class TodoListWindow extends BasicWindow  {
             if (todoDataItems.isEmpty())
                 return;
 
-            MessageDialogButton selectedBtn =  MessageDialog.showMessageDialog(gui,
+            MessageDialogButton selectedBtn = MessageDialog.showMessageDialog(gui,
                     "Usuwanie", "Czy na pewno chcesz usunąć wpis?",
                     MessageDialogButton.Yes, MessageDialogButton.No);
 
@@ -242,7 +267,7 @@ public class TodoListWindow extends BasicWindow  {
 
             int rowId = todoTable.getSelectedRow();
             TodoListRecord record = todoDataItems.get(rowId);
-            isEditMode =!isEditMode;
+            isEditMode = !isEditMode;
 
             if (isEditMode) {
                 String date = convertToString(record.getExpiredDate(), "dd.MM.yyyy HH.mm");
@@ -252,8 +277,7 @@ public class TodoListWindow extends BasicWindow  {
                 dateTextBox.setText(date);
                 editRowId = rowId;
                 setEditMode(true);
-            }
-            else {
+            } else {
                 setEditMode(false);
             }
         });
@@ -261,33 +285,43 @@ public class TodoListWindow extends BasicWindow  {
         todoTable.setPreferredSize(new TerminalSize(80, 10));
     }
 
-    // Aktualizacja rozmiaru okna
+    /**
+     * Metoda aktualizująca rozmiar okna na podstawie aktualnej liczby wierszy w panelu.
+     */
     public void updateSize() {
-        int rows = panel.getSize().getRows()-9;
+        int rows = panel.getSize().getRows() - 9;
         if (rows < 2) {
             return;
         }
 
-        todoTable.setPreferredSize(new TerminalSize(panel.getSize().getColumns(), panel.getSize().getRows()-9));
+        todoTable.setPreferredSize(new TerminalSize(panel.getSize().getColumns(), panel.getSize().getRows() - 9));
     }
 
-    // Ustawienie trybu edycji
+    /**
+     * Metoda ustawiająca tryb edycji dla formularza dodawania/zmiany zadania.
+     *
+     * @param isEditMode True, jeśli ma być włączony tryb edycji; False w przeciwnym razie.
+     */
     private void setEditMode(boolean isEditMode) {
         this.isEditMode = isEditMode;
         if (isEditMode) {
             addButton.setLabel("Edytuj");
             cancelEditButton.setVisible(true);
-        }
-        else {
+        } else {
             addButton.setLabel("Dodaj");
             taskTextBox.setText("");
             dateTextBox.setText("");
-            editRowId= -1;
+            editRowId = -1;
             cancelEditButton.setVisible(false);
         }
     }
 
-    // Aktualizacja stanu wykonania zadania
+    /**
+     * Metoda aktualizująca stan wykonania zadania (czy jest oznaczone jako wykonane czy nie).
+     *
+     * @param rowId Numer wiersza w tabeli.
+     * @param isDone Informacja czy zadanie jest wykonane.
+     */
     private void updateDoneState(int rowId, boolean isDone) {
         if (rowId > -1) {
             String isDoneStr = (isDone) ? "[ + ]" : "[ - ]";
@@ -296,7 +330,9 @@ public class TodoListWindow extends BasicWindow  {
         }
     }
 
-    // Aktualizacja listy zadań
+    /**
+     * Metoda aktualizująca listę zadań w tabeli.
+     */
     public void updateList() {
         todoTable.getTableModel().clear();
 
