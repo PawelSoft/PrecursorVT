@@ -27,7 +27,13 @@ public class MultiTabWindow extends BasicWindow {
     private Button resetTimerButton;
     TextBox timerInput = new TextBox();
 
-    // Konstruktor klasy MultiTabWindow
+
+    /**
+     * Konstruktor klasy MultiTabWindow.
+     *
+     * @param gui       Interfejs GUI, na którym będzie wyświetlane okno.
+     * @param mainwindow Referencja do głównego okna aplikacji.
+     */
     public MultiTabWindow(MultiWindowTextGUI gui, MainWindow mainwindow) {
         super("Multi-Tab Timer Application");
         this.gui = gui;
@@ -35,9 +41,10 @@ public class MultiTabWindow extends BasicWindow {
         initWindow();
     }
 
-    // Metoda inicjalizująca okno
+    /**
+     * Metoda inicjalizująca zawartość okna.
+     */
     private void initWindow() {
-        // Ustawienia wskazówek dla okna
         HashSet<Hint> newHints = new HashSet<>(getHints());
         newHints.add(Window.Hint.NO_POST_RENDERING);
         newHints.add(Hint.CENTERED);
@@ -45,7 +52,6 @@ public class MultiTabWindow extends BasicWindow {
 
         Panel mainPanel = new Panel(new BorderLayout());
 
-        // Zakładka aktualnego czasu
         Panel currentTimePanel = new Panel();
         currentTimeLabel = new Label(getCurrentTime());
         currentTimePanel.addComponent(new EmptySpace());
@@ -54,7 +60,6 @@ public class MultiTabWindow extends BasicWindow {
         currentTimePanel.addComponent(new EmptySpace());
         tabbedPanel.addTab("Aktualny czas", currentTimePanel);
 
-        // Zakładka stopera
         Panel stopwatchPanel = new Panel();
         stopwatchLabel = new Label("00:00:00");
         startStopwatchButton = new Button("Start", () -> {
@@ -73,7 +78,6 @@ public class MultiTabWindow extends BasicWindow {
         stopwatchPanel.addComponent(new EmptySpace());
         tabbedPanel.addTab("Stoper", stopwatchPanel);
 
-        // Zakładka minutnika
         Panel timerPanel = new Panel();
         timerPanel.addComponent(new Label("Wprowadź czas w formacie GG:MM:SS:"));
         timerInput = new TextBox("00:00:00");
@@ -84,7 +88,7 @@ public class MultiTabWindow extends BasicWindow {
                 startTimer();
             } else {
                 startTimerButton.setLabel("Start");
-                stoptime();
+                stopTime();
             }
         });
         timerPanel.addComponent(timerInput);
@@ -92,7 +96,7 @@ public class MultiTabWindow extends BasicWindow {
         timerPanel.addComponent(startTimerButton);
         tabbedPanel.addTab("Minutnik", timerPanel);
 
-        // Przycisk powrotu do głównego menu
+
         Button backToMainWindowBtn = new Button("Wyjdź do menu", () -> {
             gui.removeWindow(MultiTabWindow.this);
             gui.addWindowAndWait(mainwindow);
@@ -102,7 +106,7 @@ public class MultiTabWindow extends BasicWindow {
         mainPanel.addComponent(tabbedPanel);
         setComponent(mainPanel);
 
-        // Aktualizacja czasu co sekundę
+
         timer = new Timer(true);
         timer.scheduleAtFixedRate(new TimerTask() {
             @Override
@@ -112,7 +116,9 @@ public class MultiTabWindow extends BasicWindow {
         }, 0, 1000);
     }
 
-    // Metoda uruchamiająca stoper
+    /**
+     * Metoda uruchamiająca stoper.
+     */
     private void startStopwatch() {
         if (!stopwatchRunning) {
             stopwatchRunning = true;
@@ -133,18 +139,24 @@ public class MultiTabWindow extends BasicWindow {
         }
     }
 
-    // Metoda zatrzymująca stoper
+    /**
+     * Metoda zatrzymująca stoper.
+     */
     private void stopStopwatch() {
         stopwatchRunning = false;
     }
 
-    // Metoda zatrzymująca minutnik i resetująca jego wartość
-    private void stoptime() {
+    /**
+     * Metoda zatrzymująca minutnik i resetująca jego wartość.
+     */
+    private void stopTime() {
         timerRunning = false;
         timerInput.setText("00:00:00");
     }
 
-    // Metoda uruchamiająca minutnik
+    /**
+     * Metoda uruchamiająca minutnik.
+     */
     private void startTimer() {
         if (!timerRunning) {
             timerRunning = true;
@@ -179,7 +191,11 @@ public class MultiTabWindow extends BasicWindow {
         }
     }
 
-    // Metoda zwracająca aktualny czas
+    /**
+     * Metoda zwracająca aktualny czas w formacie HH:mm:ss.
+     *
+     * @return Aktualny czas jako ciąg znaków.
+     */
     private String getCurrentTime() {
         return LocalTime.now().format(DateTimeFormatter.ofPattern("HH:mm:ss"));
     }

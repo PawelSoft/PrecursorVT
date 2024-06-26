@@ -9,21 +9,29 @@ import com.googlecode.lanterna.gui2.ComponentRenderer;
 import com.googlecode.lanterna.gui2.ProgressBar;
 import com.googlecode.lanterna.gui2.TextGUIGraphics;
 
+/**
+ * Klasa reprezentująca kolorowany pasek postępu.
+ */
 public class ColoredProgressBar extends ProgressBar {
 
-    // Definicje stylów dla różnych kolorów tła paska postępu
     private static final DefaultMutableThemeStyle redThemeStyle = new DefaultMutableThemeStyle(TextColor.ANSI.WHITE, TextColor.ANSI.RED);
     private static final DefaultMutableThemeStyle greenThemeStyle = new DefaultMutableThemeStyle(TextColor.ANSI.WHITE, TextColor.ANSI.GREEN);
     private static final DefaultMutableThemeStyle blueThemeStyle = new DefaultMutableThemeStyle(TextColor.ANSI.WHITE, TextColor.ANSI.BLUE_BRIGHT);
 
-    // Wybrany styl tematyczny, który zostanie zastosowany do paska postępu
     private DefaultMutableThemeStyle selectedThemeStyle;
 
-    // Konstruktor przyjmujący minimalną i maksymalną wartość, preferowaną szerokość oraz kolor paska postępu
+    /**
+     * Konstruktor inicjujący kolorowany pasek postępu.
+     *
+     * @param min            Minimalna wartość paska postępu.
+     * @param max            Maksymalna wartość paska postępu.
+     * @param preferredWidth Preferowana szerokość paska postępu.
+     * @param color          Kolor paska postępu (TextColor.ANSI).
+     */
+
     public ColoredProgressBar(int min, int max, int preferredWidth, TextColor.ANSI color) {
         super(min, max, preferredWidth);
 
-        // Ustawienie wybranego stylu tematycznego na podstawie podanego koloru
         if (color == TextColor.ANSI.RED) {
             selectedThemeStyle = redThemeStyle;
         }
@@ -35,18 +43,30 @@ public class ColoredProgressBar extends ProgressBar {
         }
     }
 
-    // Tworzy domyślny renderer dla paska postępu, który będzie używany do rysowania komponentu
-    @Override
+    /**
+     * Tworzy domyślny renderer dla paska postępu, który będzie używany do rysowania komponentu.
+     *
+     * @return Renderer paska postępu.
+     */    @Override
     protected ComponentRenderer<ProgressBar> createDefaultRenderer() {
         return new CustomProgressBarRenderer();
     }
-
-    // Klasa wewnętrzna definiująca renderer dla paska postępu
+    /**
+     * Klasa wewnętrzna definiująca renderer dla paska postępu.
+     */
     public static class CustomProgressBarRenderer implements ComponentRenderer<ProgressBar> {
+        /**
+         * Konstruktor renderer'a paska postępu.
+         */
+
         public CustomProgressBarRenderer() {
         }
-
-        // Zwraca preferowany rozmiar dla paska postępu
+        /**
+         * Zwraca preferowany rozmiar dla paska postępu.
+         *
+         * @param component Pasek postępu.
+         * @return Preferowany rozmiar.
+         */
         public TerminalSize getPreferredSize(ProgressBar component) {
             int preferredWidth = component.getPreferredWidth();
             if (preferredWidth > 0) {
@@ -57,8 +77,12 @@ public class ColoredProgressBar extends ProgressBar {
                         : new TerminalSize(10, 1);
             }
         }
-
-        // Rysuje komponent paska postępu
+        /**
+         * Rysuje komponent paska postępu.
+         *
+         * @param graphics  Grafika do rysowania.
+         * @param component Pasek postępu.
+         */
         public void drawComponent(TextGUIGraphics graphics, ProgressBar component) {
             TerminalSize size = graphics.getSize();
             if (size.getRows() != 0 && size.getColumns() != 0) {
@@ -83,10 +107,8 @@ public class ColoredProgressBar extends ProgressBar {
                 int labelStartPosition = (size.getColumns() - labelWidth) / 2;
 
                 for(int row = 0; row < size.getRows(); ++row) {
-                    // Rzutowanie komponentu na ColoredProgressBar w celu uzyskania wybranego koloru
                     ColoredProgressBar coloredBar = (ColoredProgressBar) component;
 
-                    // Zastosowanie wybranego stylu tematycznego (koloru)
                     graphics.applyThemeStyle(coloredBar.getSelectedColor());
 
                     for(int column = 0; column < size.getColumns(); ++column) {
@@ -113,8 +135,11 @@ public class ColoredProgressBar extends ProgressBar {
         }
     }
 
-    // Zwraca wybrany styl tematyczny (kolor)
-    public DefaultMutableThemeStyle getSelectedColor() {
+    /**
+     * Zwraca wybrany styl tematyczny (kolor).
+     *
+     * @return Wybrany styl tematyczny.
+     */    public DefaultMutableThemeStyle getSelectedColor() {
         return selectedThemeStyle;
     }
 }

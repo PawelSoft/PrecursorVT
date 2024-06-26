@@ -8,9 +8,12 @@ import java.util.regex.Pattern;
 
 import static org.psk.Component.NumberSystemConverter.*;
 
+
+/**
+ * Okno aplikacji konwertera systemów liczbowych.
+ */
 public class NumberSystemConverterWindow extends BasicWindow {
 
-    // Pola okna konwertera systemów liczbowych
     private final RadioBoxList<String> convertFromOptions = new RadioBoxList<>();
     private final Label binaryLabelRes = new Label("---");
     private final Label octalLabelRes = new Label("---");
@@ -20,7 +23,12 @@ public class NumberSystemConverterWindow extends BasicWindow {
     private final MultiWindowTextGUI gui;
     private final MainWindow mainwindow;
 
-    // Konstruktor klasy NumberSystemConverterWindow
+    /**
+     * Konstruktor klasy NumberSystemConverterWindow.
+     *
+     * @param gui       Interfejs GUI, na którym będzie wyświetlane okno.
+     * @param mainwindow Referencja do głównego okna aplikacji.
+     */
     public NumberSystemConverterWindow(MultiWindowTextGUI gui, MainWindow mainwindow) {
         super("Konwerter systemów liczbowych");
         this.gui = gui;
@@ -28,11 +36,13 @@ public class NumberSystemConverterWindow extends BasicWindow {
         initWindow();
     }
 
-    // Metoda inicjalizująca okno konwertera
+    /**
+     * Metoda inicjalizująca okno konwertera systemów liczbowych.
+     */
     private void initWindow() {
         Panel panel = new Panel();
 
-        // Komponenty interfejsu użytkownika
+
         Label labelTextToConvert = new Label("Wprowadź wartość:");
         TextBox numberToConvert = new TextBox();
 
@@ -42,26 +52,24 @@ public class NumberSystemConverterWindow extends BasicWindow {
         Label hexLabel = new Label("Szesnastkowy (Hex):");
         Label decimalLabel = new Label("Dziesiętny (Dec):");
 
-        // Ustawienia wskazówek dla okna
         HashSet<Hint> newHints = new HashSet<>(getHints());
         newHints.add(Hint.CENTERED);
         setHints(newHints);
 
-        // Ustawienie preferowanej wielkości pola tekstowego
+
         numberToConvert.setPreferredSize(new TerminalSize(20, 1));
         labelInfo.setLabelWidth(26);
 
-        // Dodanie opcji konwersji do listy
+
         convertFromOptions.addItem("Dziesiętny (Dec)").addItem("Binarny (Binary)")
                 .addItem("Ósemkowy (Octal)").addItem("Szesnastkowy (Hex)");
         convertFromOptions.setCheckedItemIndex(0);
         convertFromOptions.addListener((i, i1) -> updateResults(numberToConvert.getText()));
 
-        // Ustawienie wzorca walidacji dla pola tekstowego
+
         numberToConvert.setValidationPattern(Pattern.compile("\\d{0,17}"));
         numberToConvert.setTextChangeListener((s, b) -> updateResults(s));
 
-        // Dodanie komponentów do panelu wyników
         resultPanel.addComponent(binaryLabel);
         resultPanel.addComponent(binaryLabelRes);
         resultPanel.addComponent(octalLabel);
@@ -71,7 +79,6 @@ public class NumberSystemConverterWindow extends BasicWindow {
         resultPanel.addComponent(decimalLabel);
         resultPanel.addComponent(decimalLabelRes);
 
-        // Dodanie komponentów do głównego panelu
         panel.addComponent(labelTextToConvert);
         panel.addComponent(numberToConvert);
         panel.addComponent(convertFromOptions);
@@ -88,7 +95,11 @@ public class NumberSystemConverterWindow extends BasicWindow {
         setComponent(panel);
     }
 
-    // Metoda aktualizująca wyniki konwersji
+    /**
+     * Metoda aktualizująca wyniki konwersji na podstawie wprowadzonych danych.
+     *
+     * @param input Wprowadzone dane do konwersji.
+     */
     private void updateResults(String input) {
         int inputNumber;
         int convNumber;
@@ -111,29 +122,28 @@ public class NumberSystemConverterWindow extends BasicWindow {
         try {
             inputNumber = Integer.parseInt(input);
 
-            // Wykonanie konwersji na podstawie wybranej opcji
             switch (convertFromOptions.getCheckedItemIndex()) {
-                case 0: // Dziesiętny (Dec)
+                case 0:
                     binStr = decimalToBinary(inputNumber);
                     octalStr = decimalToOctal(inputNumber);
                     hexStr = decimalToHexadecimal(inputNumber);
                     decStr = String.valueOf(inputNumber);
                     break;
-                case 1: // Binarny (Binary)
+                case 1:
                     convNumber = binaryToDecimal(input);
                     binStr = String.valueOf(inputNumber);
                     octalStr = decimalToOctal(convNumber);
                     hexStr = decimalToHexadecimal(convNumber);
                     decStr = String.valueOf(convNumber);
                     break;
-                case 2: // Ósemkowy (Octal)
+                case 2:
                     convNumber = octalToDecimal(input);
                     binStr = decimalToBinary(convNumber);
                     octalStr = String.valueOf(inputNumber);
                     hexStr = decimalToHexadecimal(convNumber);
                     decStr = String.valueOf(convNumber);
                     break;
-                case 3: // Szesnastkowy (Hex)
+                case 3:
                     convNumber = hexadecimalToDecimal(input);
                     binStr = decimalToBinary(convNumber);
                     octalStr = decimalToOctal(convNumber);
@@ -145,7 +155,6 @@ public class NumberSystemConverterWindow extends BasicWindow {
                     break;
             }
 
-            // Aktualizacja etykiet wynikowych
             binaryLabelRes.setText(binStr);
             octalLabelRes.setText(octalStr);
             hexLabelRes.setText(hexStr.toUpperCase());
