@@ -1,15 +1,13 @@
-package org.psk.uicomponent;
+package org.psk;
 
 import org.junit.jupiter.api.Test;
-import org.psk.RGBConverterWindow;
-
 import static org.junit.jupiter.api.Assertions.*;
 
 public class RGBConverterWindowTest {
 
     @Test
     public void testConvertRGBtoHex() {
-        RGBConverterWindow window = new RGBConverterWindow(null, null);
+        RGBConverterWindow window = new RGBConverterWindow(null, null, null);
 
         assertEquals("#000000", window.convertRGBtoHex(0, 0, 0));
 

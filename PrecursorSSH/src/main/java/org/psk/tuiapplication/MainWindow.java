@@ -1,15 +1,14 @@
-package org.psk;
+package org.psk.tuiapplication;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.TextColor;
 import com.googlecode.lanterna.gui2.*;
-import org.psk.uicomponent.BlinkingLabel;
+import org.apache.sshd.client.ClientBuilder;
+import org.psk.ClientHandler;
+import org.psk.tuiapplication.uicomponent.BlinkingLabel;
 
 import java.util.HashSet;
 
-/**
- * Klasa głównego okna aplikacji zawierająca menu.
- */
 public class MainWindow extends BasicWindow {
 
     private final RGBConverterWindow rgbconverterwindow;
@@ -18,11 +17,13 @@ public class MainWindow extends BasicWindow {
     private final MultiTabWindow multiTabWindow;
     private final MultiWindowTextGUI gui;
 
+    private final ClientHandler clientHandler;
+
     /**
      * Konstruktor głównego okna aplikacji.
      * @param gui Interfejs tekstowy GUI, na którym będzie wyświetlane okno.
      */
-    public MainWindow(MultiWindowTextGUI gui) {
+    public MainWindow(MultiWindowTextGUI gui, ClientHandler clientHandler) {
         super("PrecursorVT");
         this.gui = gui;
 
@@ -30,6 +31,7 @@ public class MainWindow extends BasicWindow {
         rgbconverterwindow = new RGBConverterWindow(gui, this, todolistwindow);
         numbersystemconverterwindow = new NumberSystemConverterWindow(gui, this, todolistwindow);
         multiTabWindow = new MultiTabWindow(gui, this);
+        this.clientHandler = clientHandler;
 
         initWindow();
     }
@@ -86,7 +88,10 @@ public class MainWindow extends BasicWindow {
         panel.addComponent(buttonMultiTabWindow);
 
         panel.addComponent(new EmptySpace());
-        Button buttonClose = new Button("Wyjdź z programu", () -> System.exit(0));
+        Button buttonClose = new Button("Wyjdź z programu", () ->  {
+            this.close();
+            clientHandler.terminateSession();
+        });
         buttonClose.setPreferredSize(new TerminalSize(40, 2));
         panel.addComponent(buttonClose);
 

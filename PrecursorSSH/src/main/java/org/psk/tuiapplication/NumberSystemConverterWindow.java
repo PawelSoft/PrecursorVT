@@ -1,4 +1,4 @@
-package org.psk;
+package org.psk.tuiapplication;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
@@ -6,7 +6,7 @@ import com.googlecode.lanterna.gui2.*;
 import java.util.HashSet;
 import java.util.regex.Pattern;
 
-import static org.psk.uicomponent.NumberSystemConverter.*;
+import static org.psk.tuiapplication.uicomponent.NumberSystemConverter.*;
 
 /**
  * Okno aplikacji konwertera systemów liczbowych.
@@ -72,7 +72,7 @@ public class NumberSystemConverterWindow extends BasicWindow {
         convertFromOptions.setCheckedItemIndex(0);
         convertFromOptions.addListener((i, i1) -> updateResults(numberToConvert.getText()));
 
-        numberToConvert.setValidationPattern(Pattern.compile("[0-9a-f]{0,17}"));
+        numberToConvert.setValidationPattern(Pattern.compile("\\d{0,17}"));
         numberToConvert.setTextChangeListener((s, b) -> updateResults(s));
 
         resultPanel.addComponent(binaryLabel);
@@ -105,7 +105,7 @@ public class NumberSystemConverterWindow extends BasicWindow {
      * @param input Wprowadzone dane do konwersji.
      */
     private void updateResults(String input) {
-        int inputNumber = 0;
+        int inputNumber;
         int convNumber;
 
         String binStr;
@@ -124,15 +124,7 @@ public class NumberSystemConverterWindow extends BasicWindow {
             return;
 
         try {
-            if (!input.contains("a") && !input.contains("b") && !input.contains("c") && !input.contains("d")
-                    && !input.contains("e") && !input.contains("f")) {
-                inputNumber = Integer.parseInt(input);
-            }
-            else {
-                if (convertFromOptions.getCheckedItemIndex() == 0) {
-                    labelInfo.setText("Niepoprawny format wprowadzonych danych. Podaj poprawną liczbę.");
-                }
-            }
+            inputNumber = Integer.parseInt(input);
 
             switch (convertFromOptions.getCheckedItemIndex()) {
                 case 0:
@@ -159,7 +151,7 @@ public class NumberSystemConverterWindow extends BasicWindow {
                     convNumber = hexadecimalToDecimal(input);
                     binStr = decimalToBinary(convNumber);
                     octalStr = decimalToOctal(convNumber);
-                    hexStr = input;
+                    hexStr = String.valueOf(inputNumber);
                     decStr = String.valueOf(convNumber);
                     break;
                 default:

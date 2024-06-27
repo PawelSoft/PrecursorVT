@@ -1,7 +1,7 @@
-package org.psk;
+package org.psk.tuiapplication;
 
 import com.googlecode.lanterna.gui2.*;
-import org.psk.uicomponent.TabbedPanel;
+import org.psk.tuiapplication.uicomponent.TabbedPanel;
 
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -9,9 +9,6 @@ import java.util.HashSet;
 import java.util.Timer;
 import java.util.TimerTask;
 
-/**
- * Jest to okno aplikacji typu "wielozakładkowej", które oferuje różne funkcje związane z czasem.
- */
 public class MultiTabWindow extends BasicWindow {
     private final MultiWindowTextGUI gui;
     private final MainWindow mainwindow;

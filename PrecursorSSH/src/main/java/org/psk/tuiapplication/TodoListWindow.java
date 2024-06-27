@@ -1,4 +1,4 @@
-package org.psk;
+package org.psk.tuiapplication;
 
 import com.googlecode.lanterna.TerminalSize;
 import com.googlecode.lanterna.gui2.*;
@@ -8,8 +8,8 @@ import com.googlecode.lanterna.gui2.menu.Menu;
 import com.googlecode.lanterna.gui2.menu.MenuBar;
 import com.googlecode.lanterna.gui2.menu.MenuItem;
 import com.googlecode.lanterna.screen.Screen;
-import org.psk.uicomponent.TodoListRecord;
-import org.psk.uicomponent.TodoTable;
+import org.psk.tuiapplication.uicomponent.TodoListRecord;
+import org.psk.tuiapplication.uicomponent.TodoTable;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -20,9 +20,6 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-/**
- * Klasa okna listy Todo.
- */
 public class TodoListWindow extends BasicWindow  {
 
     public final static String dateRegex
