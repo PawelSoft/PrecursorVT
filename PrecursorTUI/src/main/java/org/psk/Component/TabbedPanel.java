@@ -5,85 +5,104 @@ import com.googlecode.lanterna.gui2.*;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Panel zakładek umożliwiający przełączanie się między różnymi zawartościami.
+ */
 public class TabbedPanel extends Panel {
 
-    // Lista przechowująca wszystkie zakładki
     private final List<Tab> tabs = new ArrayList<>();
-    // Indeks aktualnie wybranej zakładki
     private int selectedTabIndex = 0;
-    // Panel do wyświetlania zawartości zakładek
     private final Panel tabContentPanel;
-    // Panel do wyświetlania nagłówków zakładek
     private final Panel tabHeaderPanel;
 
-    // Konstruktor ustawiający układ panelu na BorderLayout
+    /**
+     * Konstruktor ustawiający układ panelu na BorderLayout i inicjujący panele nagłówków i zawartości zakładek.
+     */
     public TabbedPanel() {
         super(new BorderLayout());
 
-        // Inicjalizacja panelu nagłówków zakładek z układem poziomym
+
         tabHeaderPanel = new Panel(new LinearLayout(Direction.HORIZONTAL));
-        // Inicjalizacja panelu zawartości zakładek z układem BorderLayout
         tabContentPanel = new Panel(new BorderLayout());
 
-        // Dodanie panelu nagłówków z obramowaniem na górze oraz panelu zawartości na środku
         addComponent(tabHeaderPanel.withBorder(Borders.singleLine()), BorderLayout.Location.TOP);
         addComponent(tabContentPanel, BorderLayout.Location.CENTER);
     }
 
-    // Metoda dodająca nową zakładkę do panelu
+    /**
+     * Dodaje nową zakładkę do panelu.
+     *
+     * @param title     Tytuł zakładki.
+     * @param component Komponent do wyświetlenia w zakładce.
+     */
     public void addTab(String title, Component component) {
         Tab tab = new Tab(title, component);
         tabs.add(tab);
         updateTabs();
     }
 
-    // Aktualizuje wyświetlane zakładki i zawartość
+    /**
+     * Aktualizuje wyświetlane zakładki oraz ich zawartość.
+     */
     private void updateTabs() {
         tabHeaderPanel.removeAllComponents();
 
-        // Tworzenie przycisków dla każdej zakładki
         for (int i = 0; i < tabs.size(); i++) {
             final int tabIndex = i;
             Tab tab = tabs.get(i);
             String btnLabel = tab.title;
             Button tabButton = new Button(tab.title, () -> selectTab(tabIndex));
-            tabButton.setRenderer(new TabFlatButtonRenderer());
-            // Dodanie nawiasów do etykiety przycisku, jeśli jest to aktualnie wybrana zakładka
+            tabButton.setRenderer(new org.psk.uicomponent.TabFlatButtonRenderer());
             if (i == selectedTabIndex) {
                 tabButton.setLabel("[" + btnLabel + "]");
             }
             tabHeaderPanel.addComponent(tabButton);
         }
 
-        // Aktualizacja zawartości zakładki
         tabContentPanel.removeAllComponents();
         tabContentPanel.addComponent(tabs.get(selectedTabIndex).component);
         invalidate();
     }
 
-    // Wybiera zakładkę o podanym indeksie
+    /**
+     * Wybiera zakładkę o podanym indeksie.
+     *
+     * @param index Indeks wybranej zakładki.
+     */
     private void selectTab(int index) {
         selectedTabIndex = index;
         updateTabs();
     }
 
-    // Przechodzi do następnej zakładki
+    /**
+     * Przechodzi do następnej zakładki.
+     */
     private void nextTab() {
         selectedTabIndex = (selectedTabIndex + 1) % tabs.size();
         updateTabs();
     }
 
-    // Przechodzi do poprzedniej zakładki
+    /**
+     * Przechodzi do poprzedniej zakładki.
+     */
     private void previousTab() {
         selectedTabIndex = (selectedTabIndex - 1 + tabs.size()) % tabs.size();
         updateTabs();
     }
 
-    // Klasa wewnętrzna reprezentująca pojedynczą zakładkę
+    /**
+     * Klasa wewnętrzna reprezentująca pojedynczą zakładkę.
+     */
     private static class Tab {
-        String title;      // Tytuł zakładki
-        Component component; // Komponent do wyświetlenia w zakładce
+        String title;
+        Component component;
 
+        /**
+         * Konstruktor tworzący nową zakładkę.
+         *
+         * @param title     Tytuł zakładki.
+         * @param component Komponent do wyświetlenia w zakładce.
+         */
         Tab(String title, Component component) {
             this.title = title;
             this.component = component;
